@@ -54,7 +54,7 @@
 	"eslint.format.enable": true,
 	"workbench.colorTheme": "Dracula Soft",
 	"prettier.singleQuote": true,
-	"prettier.useTabs": true,
+	"prettier.useTabs": false,
 	"window.zoomLevel": 2,
 	"tabnine.experimentalAutoImports": true,
 	"workbench.iconTheme": "vscode-icons",
