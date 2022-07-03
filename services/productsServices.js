@@ -5,7 +5,7 @@ const getAllProducts = async () => {
   if (!products.length) {
     return {
       error: {
-        message: "Can't find products",
+        message: 'Cannot find products',
       },
     };
   }
@@ -31,5 +31,14 @@ const getProductById = async (id) => {
     httpStatus: 200,
   };
 };
+
+const teste = async (id) => {
+  const result1 = await getAllProducts();
+  const result = await getProductById(id);
+  console.log('all prod', result1);
+  console.log('by id', result);
+};
+
+teste(2);
 
 module.exports = { getAllProducts, getProductById };
