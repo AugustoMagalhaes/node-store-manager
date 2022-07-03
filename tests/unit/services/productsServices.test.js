@@ -21,10 +21,12 @@ describe('4 - Procura por todos produtos em services', () => {
 
   it('Chamando todos os produtos', async () => {
     const productsList = await productsServices.getAllProducts();
-    expect(productsList).to.be.an('array');
-    expect(productsList).to.have.lengthOf(3);
+    const { payload } = productsList;
+    expect(productsList).to.have.property('payload');
+    expect(payload).to.be.an('array');
+    expect(payload).to.have.lengthOf(3);
 
-    productsList.forEach((product) => {
+    payload.forEach((product) => {
       expect(product).to.have.property('id');
     });
   });
