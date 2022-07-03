@@ -2,7 +2,10 @@ const productsModels = require('../models/productsModels');
 
 const getAllProducts = async () => {
   const products = await productsModels.getAllProducts();
-  return products;
+  return {
+    payload: products,
+    httpStatus: 200,
+  };
 };
 
 const getProductById = async (id) => {
@@ -21,5 +24,14 @@ const getProductById = async (id) => {
     httpStatus: 200,
   };
 };
+
+const teste = async (id) => {
+  const result1 = await getAllProducts();
+  const result = await getProductById(id);
+  console.log('all prod', result1);
+  console.log('by id', result);
+};
+
+teste(1);
 
 module.exports = { getAllProducts, getProductById };
