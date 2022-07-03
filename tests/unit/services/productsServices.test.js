@@ -5,29 +5,47 @@ const productsModels = require('../../../models/productsModels');
 const productsServices = require('../../../services/productsServices');
 
 describe('4 - Procura por todos produtos em services', () => {
-  before(async () => {
-    const allProducts = [
-      { id: 1, name: 'Martelo de Thor' },
-      { id: 2, name: 'Traje de encolhimento' },
-      { id: 3, name: 'Escudo do Capitão América' },
-    ];
+  describe('4.1 - Quando o banco de dados encontra os produtos', async () => {
+    before(async () => {
+      const allProducts = [
+        { id: 1, name: 'Martelo de Thor' },
+        { id: 2, name: 'Traje de encolhimento' },
+        { id: 3, name: 'Escudo do Capitão América' },
+      ];
 
-    sinon.stub(productsModels, 'getAllProducts').resolves(allProducts);
+      sinon.stub(productsModels, 'getAllProducts').resolves(allProducts);
+    });
+
+    after(async () => {
+      productsModels.getAllProducts.restore();
+    });
+
+    it('Chamando todos os produtos', async () => {
+      const productsList = await productsServices.getAllProducts();
+      const { payload } = productsList;
+      expect(productsList).to.have.property('payload');
+      expect(payload).to.be.an('array');
+      expect(payload).to.have.lengthOf(3);
+
+      payload.forEach((product) => {
+        expect(product).to.have.property('id');
+      });
+    });
   });
+  describe('4. 2Quando o banco de dados não encontra os produtos', async () => {
+    before(async () => {
+      const notFound = [];
 
-  after(async () => {
-    productsModels.getAllProducts.restore();
-  });
+      sinon.stub(productsModels, 'getAllProducts').resolves(notFound);
+    });
+    after(async () => {
+      productsModels.getAllProducts.restore();
+    });
 
-  it('Chamando todos os produtos', async () => {
-    const productsList = await productsServices.getAllProducts();
-    const { payload } = productsList;
-    expect(productsList).to.have.property('payload');
-    expect(payload).to.be.an('array');
-    expect(payload).to.have.lengthOf(3);
-
-    payload.forEach((product) => {
-      expect(product).to.have.property('id');
+    it('O retorno contem um objeto de erro adequado', async () => {
+      const products = await productsServices.getAllProducts();
+      expect(products).to.have.property('error');
+      expect(products).to.have.property('httpStatus', 404);
     });
   });
 
