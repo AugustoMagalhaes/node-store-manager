@@ -2,9 +2,7 @@ const productsModels = require('../models/productsModels');
 
 const getAllProducts = async () => {
   const products = await productsModels.getAllProducts();
-  const opa = [];
-  console.log(products);
-  if (!opa.length) {
+  if (!products.length) {
     return {
       error: {
         message: "Can't find products",
