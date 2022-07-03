@@ -4,10 +4,7 @@ require('dotenv').config();
 
 const connection = require('../../../models/connection');
 
-const {
-  getAllProducts,
-  getProductById,
-} = require('../../../models/productsModels');
+const productsModels = require('../../../models/productsModels');
 
 describe('1 - Testa .env em connection', () => {
   it('Testa se o banco de dados existe', () => {
@@ -33,7 +30,7 @@ describe('2 - Testa a chamada ao banco de dados de "getAllProducts" ', async () 
   });
 
   it('Testa se os produtos sao chamados corretamente', async () => {
-    const products = await getAllProducts();
+    const products = await productsModels.getAllProducts();
     expect(products).to.have.lengthOf(3);
 
     products.forEach((product) => {
@@ -54,7 +51,7 @@ describe('3 - Testa a chamada ao banco de dados de "getProductById" ', async () 
     });
 
     it('Testa se o elemento retornado possui o id correto', async () => {
-      const captainShield = await getProductById(3);
+      const captainShield = await productsModels.getProductById(3);
       expect(captainShield[0]).to.have.property('id', 3);
       expect(captainShield).to.have.lengthOf(1);
     });
@@ -71,7 +68,7 @@ describe('3 - Testa a chamada ao banco de dados de "getProductById" ', async () 
     });
 
     it('Testa se não retorna nada quando o id não existe no banco de dados', async () => {
-      const shouldNotFind = await getProductById(4);
+      const shouldNotFind = await productsModels.getProductById(4);
       expect(shouldNotFind).to.be.an('array');
       expect(shouldNotFind).to.have.lengthOf(0);
     });
