@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const app = require('./app');
 
-app.use(morgan);
+app.use(morgan('tiny'));
 app.use(helmet());
 
 const productsRouter = require('./routes/productsRouter');
