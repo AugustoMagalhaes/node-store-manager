@@ -7,6 +7,7 @@ const getAllProducts = async () => {
       error: {
         message: 'Cannot find products',
       },
+      httpStatus: 404,
     };
   }
   return {
@@ -21,9 +22,9 @@ const getProductById = async (id) => {
     return {
       error: {
         code: 'notFound',
-        httpStatus: 404,
-        message: 'Product not Found',
+        message: 'Product not found',
       },
+      httpStatus: 404,
     };
   }
   return {
@@ -31,14 +32,5 @@ const getProductById = async (id) => {
     httpStatus: 200,
   };
 };
-
-const teste = async (id) => {
-  const result1 = await getAllProducts();
-  const result = await getProductById(id);
-  console.log('all prod', result1);
-  console.log('by id', result);
-};
-
-teste(2);
 
 module.exports = { getAllProducts, getProductById };
