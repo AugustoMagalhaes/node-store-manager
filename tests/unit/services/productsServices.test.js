@@ -1,10 +1,15 @@
 const sinon = require('sinon');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const { expect } = require('chai');
+
+chai.use(chaiAsPromised);
 
 const productsModels = require('../../../models/productsModels');
 const productsServices = require('../../../services/productsServices');
 
 describe('4 - Procura por todos produtos em services', () => {
+  beforeEach(sinon.restore);
   describe('4.1 - Quando o banco de dados encontra os produtos', async () => {
     before(async () => {
       const allProducts = [
@@ -14,10 +19,6 @@ describe('4 - Procura por todos produtos em services', () => {
       ];
 
       sinon.stub(productsModels, 'getAllProducts').resolves(allProducts);
-    });
-
-    after(async () => {
-      productsModels.getAllProducts.restore();
     });
 
     it('Chamando todos os produtos', async () => {
@@ -32,20 +33,14 @@ describe('4 - Procura por todos produtos em services', () => {
       });
     });
   });
-  describe('4. 2Quando o banco de dados não encontra os produtos', async () => {
-    before(async () => {
-      const notFound = [];
 
-      sinon.stub(productsModels, 'getAllProducts').resolves(notFound);
-    });
-    after(async () => {
-      productsModels.getAllProducts.restore();
-    });
-
+  describe('4.2 - Quando o banco de dados não encontra os produtos', async () => {
     it('O retorno contem um objeto de erro adequado', async () => {
+      const notFound = [];
+      sinon.stub(productsModels, 'getAllProducts').resolves(notFound);
       const products = await productsServices.getAllProducts();
+      console.log('products 4,2', products);
       expect(products).to.have.property('error');
-      expect(products).to.have.property('httpStatus', 404);
     });
   });
 
@@ -86,5 +81,24 @@ describe('5 - Procura produto por id em services', () => {
       expect(notFound).to.be.an('object');
       expect(notFound).to.have.property('error');
     });
+  });
+});
+
+describe('productsServices.createProduct', () => {
+  beforeEach(sinon.restore);
+
+  it('dispara um erro quando productsModel nao retorna', async () => {
+    sinon.stub(productsModels, 'createProduct').resolves([]);
+    const product = await productsServices.createProduct('name');
+    chai.expect(product).to.have.property('error');
+  });
+
+  it('quando productsModel retorna corretamente', async () => {
+    sinon.stub(productsModels, 'createProduct').resolves([[]]);
+    const product = await productsServices.createProduct('name');
+    const { payload } = product;
+    expect(product).to.have.property('payload');
+    expect(product).to.have.property('httpStatus');
+    expect(payload).to.have.property('name', 'name');
   });
 });
