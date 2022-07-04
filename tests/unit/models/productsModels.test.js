@@ -1,19 +1,23 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 require('dotenv').config();
+
+chai.use(chaiAsPromised);
 
 const connection = require('../../../models/connection');
 
 const productsModels = require('../../../models/productsModels');
 
-describe('1 - Testa .env em connection', () => {
+describe('Testa .env em connection', () => {
   it('Testa se o banco de dados existe', () => {
     const db = connection.pool.config.connectionConfig.database;
     expect(db).to.equal('StoreManager');
   });
 });
 
-describe('2 - Testa a chamada ao banco de dados de "getAllProducts" ', async () => {
+describe('Testa a chamada ao banco de dados de "getAllProducts" ', async () => {
   before(async () => {
     const allProducts = [
       [
@@ -72,5 +76,15 @@ describe('3 - Testa a chamada ao banco de dados de "getProductById" ', async () 
       expect(shouldNotFind).to.be.an('array');
       expect(shouldNotFind).to.have.lengthOf(0);
     });
+  });
+});
+
+describe('productsModel.createProduct', () => {
+  beforeEach(sinon.restore);
+
+  it('produto inserido com sucesso', async () => {
+    sinon.stub(connection, 'execute').resolves([]);
+    const result = await productsModels.createProduct('name');
+    return chai.expect(result).to.deep.equal([]);
   });
 });
