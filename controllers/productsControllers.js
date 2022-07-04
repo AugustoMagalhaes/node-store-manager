@@ -31,4 +31,21 @@ const getProductById = async (req, res) => {
   }
 };
 
-module.exports = { getAllProducts, getProductById };
+const createProduct = async (req, res) => {
+  const { name } = req.body;
+  const product = await productsServices.createProduct(name);
+
+  const { error, payload, httpStatus } = product;
+
+  try {
+    if (error) {
+      throw new Error(error.message, httpStatus);
+    }
+  } catch (err) {
+    return res.status(httpStatus).json({ message: error.message });
+  }
+
+  return res.status(httpStatus).json(payload);
+};
+
+module.exports = { getAllProducts, getProductById, createProduct };
