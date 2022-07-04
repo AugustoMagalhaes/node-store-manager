@@ -33,4 +33,24 @@ const getProductById = async (id) => {
   };
 };
 
-module.exports = { getAllProducts, getProductById };
+const createProduct = async (name) => {
+  const [product] = await productsModels.createProduct(name);
+  if (!product || !name) {
+    return {
+      error: {
+        message: 'Cannot create product',
+      },
+      httpStatus: 400,
+    };
+  }
+  const response = {
+    payload: {
+      id: product.insertId,
+      name,
+    },
+    httpStatus: 201,
+  };
+  return response;
+};
+
+module.exports = { getAllProducts, getProductById, createProduct };
