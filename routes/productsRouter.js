@@ -4,8 +4,10 @@ const productsRouter = express.Router();
 
 const productsController = require('../controllers/productsControllers');
 
+const nameValidation = require('../middlewares/nameValidation');
+
 productsRouter.get('/', productsController.getAllProducts);
 productsRouter.get('/:id', productsController.getProductById);
-productsRouter.post('/', productsController.createProduct);
+productsRouter.post('/', nameValidation, productsController.createProduct);
 
 module.exports = productsRouter;
