@@ -1,10 +1,17 @@
 const sinon = require('sinon');
+const chai = require('chai');
 const { expect } = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
 
 const productsServices = require('../../../services/productsServices');
 const productsControllers = require('../../../controllers/productsControllers');
 
-describe('6 - Testando controller getAllProducts', () => {
+describe('6 - Testando controller getAllProducts', async () => {
+  const _req = {};
+  const res = {};
+
   before(async () => {
     const allProducts = {
       payload: [
@@ -15,6 +22,9 @@ describe('6 - Testando controller getAllProducts', () => {
       httpStatus: 200,
     };
 
+    res.status = sinon.stub().returns(res);
+    res.json = sinon.stub().returns(allProducts);
+
     sinon.stub(productsServices, 'getAllProducts').resolves(allProducts);
   });
 
@@ -23,64 +33,69 @@ describe('6 - Testando controller getAllProducts', () => {
   });
 
   it('É possível chamar todos os produtos', async () => {
-    const productsObj = await productsControllers.getAllProducts();
+    const productsObj = await productsControllers.getAllProducts(_req, res);
     const products = productsObj.payload;
-    console.log('PRODUCTS', products);
     expect(productsObj).to.have.property('payload');
     expect(products).to.have.lengthOf(3);
     expect(products).to.be.an('array');
   });
+
+  it('dispara um erro quando existe o objeto "error" em getAllProducts ', () => {
+    const notFound = {
+      error: {
+        code: 'notFound',
+        httpStatus: 404,
+        message: 'Product not found',
+      },
+    };
+
+    sinon.stub(productsServices, 'getProductById').resolves(notFound);
+    return chai.expect(productsControllers.getAllProducts({}, {})).to.eventually
+      .be.rejected;
+  });
 });
 
-describe('7 - Testando controller getProductById', () => {
-  describe('Se o produte existe', () => {
-    before(async () => {
-      const firstProduct = {
-        payload: { id: 1, name: 'Martelo de Thor' },
-        httpStatus: 200,
-      };
+describe('Controller getProductById', () => {
+  beforeEach(sinon.restore);
 
-      sinon.stub(productsServices, 'getProductById').resolves(firstProduct);
-    });
+  it('Testa se dispara um erro quando existe o objeto "error" em getProductById', async () => {
+    const notFound = {
+      error: {
+        code: 'notFound',
+        httpStatus: 404,
+        message: 'Product not found',
+      },
+    };
+    const msgError = { message: notFound.error.message };
+    const req = { params: sinon.stub().returns('4') };
+    const res = {
+      status: sinon.stub().callsFake(() => res),
+      json: sinon.stub().returns(),
+    };
 
-    after(async () => {
-      productsServices.getProductById.restore();
-    });
-
-    it('Retorna objeto com payload e httpStatus corretos', async () => {
-      const thorsHammer = await productsControllers.getProductById(1);
-      const { payload, httpStatus } = thorsHammer;
-      expect(thorsHammer).to.be.an('object');
-      expect(payload).to.be.an('array');
-      expect(payload).to.have.lengthOf(3);
-      payload.forEach((product, index) => {
-        expect(product).to.have.property('id', index + 1);
-      });
-    });
+    sinon.stub(productsServices, 'getProductById').resolves(notFound);
+    await productsControllers.getProductById(req, res);
+    return chai.expect(res.json.calledWith(msgError)).to.equal(true);
   });
 
-  describe('Quando produto nao existe', async () => {
-    before(async () => {
-      const notFound = {
-        error: {
-          code: 'notFound',
-          httpStatus: 404,
-          message: 'Product not Found',
-        },
-      };
+  it('captura um produto especifico por id', async () => {
+    const productObj = {
+      payload: [{ id: 2, name: 'Traje de encolhimento' }],
+      httpStatus: 200,
+    };
 
-      sinon.stub(productsServices, 'getProductById').resolves(notFound);
-    });
+    const req = { params: sinon.stub().returns('2') };
+    const res = {
+      status: sinon.stub().callsFake(() => res),
+      json: sinon.stub().returns(productObj.payload),
+    };
 
-    after(async () => {
-      productsServices.getProductById.restore();
-    });
+    sinon.stub(productsServices, 'getProductById').resolves(productObj);
+    await productsControllers.getProductById(req, res);
+    const { payload, httpStatus } = productObj;
+    expect(payload).to.deep.equal([{ id: 2, name: 'Traje de encolhimento' }]);
 
-    it('Retorna objeto de erro correto', async () => {
-      const errorObj = await productsControllers.getProductById(4);
-      const { error } = errorObj;
-      expect(error).to.be.an('object');
-      expect(error).to.have.property('message');
-    });
+    expect(res.json()).to.deep.equal(payload);
+    expect(res.status.calledWith(httpStatus)).to.equal(true);
   });
 });
