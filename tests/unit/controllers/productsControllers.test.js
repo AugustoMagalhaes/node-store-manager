@@ -9,10 +9,9 @@ const productsServices = require('../../../services/productsServices');
 const productsControllers = require('../../../controllers/productsControllers');
 
 describe('6 - Testando controller getAllProducts', async () => {
-  const _req = {};
-  const res = {};
+  beforeEach(sinon.restore);
 
-  before(async () => {
+  /* before(async () => {
     const allProducts = {
       payload: [
         { id: 1, name: 'Martelo de Thor' },
@@ -22,17 +21,26 @@ describe('6 - Testando controller getAllProducts', async () => {
       httpStatus: 200,
     };
 
-    res.status = sinon.stub().returns(res);
-    res.json = sinon.stub().returns(allProducts);
-
     sinon.stub(productsServices, 'getAllProducts').resolves(allProducts);
-  });
-
-  after(async () => {
-    productsServices.getAllProducts.restore();
-  });
+  }); */
 
   it('É possível chamar todos os produtos', async () => {
+    const allProducts = {
+      payload: [
+        { id: 1, name: 'Martelo de Thor' },
+        { id: 2, name: 'Traje de encolhimento' },
+        { id: 3, name: 'Escudo do Capitão América' },
+      ],
+      httpStatus: 200,
+    };
+
+    sinon.stub(productsServices, 'getAllProducts').resolves(allProducts);
+
+    const _req = {};
+    const res = {};
+    res.status = sinon.stub().callsFake(() => res);
+    res.json = sinon.stub().returns(allProducts);
+
     const productsObj = await productsControllers.getAllProducts(_req, res);
     const products = productsObj.payload;
     expect(productsObj).to.have.property('payload');
@@ -40,7 +48,7 @@ describe('6 - Testando controller getAllProducts', async () => {
     expect(products).to.be.an('array');
   });
 
-  it('dispara um erro quando existe o objeto "error" em getAllProducts ', () => {
+  it('dispara um erro quando existe o objeto "error" em getAllProducts ', async () => {
     const notFound = {
       error: {
         code: 'notFound',
@@ -49,11 +57,21 @@ describe('6 - Testando controller getAllProducts', async () => {
       },
     };
 
-    sinon.stub(productsServices, 'getProductById').resolves(notFound);
-    return chai.expect(productsControllers.getAllProducts({}, {})).to.eventually
-      .be.rejected;
+    const msgError = { message: notFound.error.message };
+    const res = {
+      status: sinon.stub().callsFake(() => res),
+      json: sinon.stub().returns(notFound),
+    };
+    const _req = {};
+
+    sinon.stub(productsServices, 'getAllProducts').resolves(notFound);
+    const result = await productsControllers.getAllProducts(_req, res);
+    expect(result).to.be.an('object');
+    expect(result).to.have.property('error');
   });
 });
+
+// ----------------------------------------
 
 describe('Controller getProductById', () => {
   beforeEach(sinon.restore);
@@ -97,5 +115,48 @@ describe('Controller getProductById', () => {
 
     expect(res.json()).to.deep.equal(payload);
     expect(res.status.calledWith(httpStatus)).to.equal(true);
+  });
+});
+
+describe('Controller createProduct', () => {
+  beforeEach(sinon.restore);
+
+  it('Dispara erro quando não cria produto', async () => {
+    const productObj = {
+      error: {
+        message: '',
+      },
+    };
+
+    const req = { body: sinon.stub().returns('name') };
+    const res = {
+      status: sinon.stub().callsFake(() => res),
+      json: sinon.stub().returns(productObj.error),
+    };
+
+    sinon.stub(productsServices, 'createProduct').resolves(productObj);
+    await productsControllers.createProduct(req, res);
+    expect(productsControllers.createProduct(req, res)).to.eventually.be
+      .rejected;
+    expect(res.json.calledWith(productObj.error)).to.equal(true);
+  });
+
+  it('produto criado com sucesso', async () => {
+    const productObj = {
+      payload: {
+        name: 'produto',
+      },
+      httpStatus: 201,
+    };
+
+    sinon.stub(productsServices, 'createProduct').resolves(productObj);
+    const req = { body: sinon.stub().returns('produto') };
+    const res = {
+      status: sinon.stub().callsFake(() => res),
+      json: sinon.stub().returns(productObj.payload),
+    };
+
+    const result = await productsControllers.createProduct(req, res);
+    expect(result).to.deep.equal({ name: 'produto' });
   });
 });

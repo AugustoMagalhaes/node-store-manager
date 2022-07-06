@@ -35,7 +35,7 @@ const getProductById = async (id) => {
 
 const createProduct = async (name) => {
   const [product] = await productsModels.createProduct(name);
-  if (!product || !name) {
+  if (!product) {
     return {
       error: {
         message: 'Cannot create product',
