@@ -1,8 +1,20 @@
 const connection = require('./connection');
 
-const createSales = async (saleId, productId, quantity) => {
-  const query = 'INSERT INTO StoreManager.sales_products VALUES (?, ?, ?);';
-  return connection.execute(query, [saleId, productId, quantity]);
+const createSalesProducts = async (saleId, productId, quantity) => {
+  const sp = 'sales_products';
+  const query = `INSERT INTO StoreManager.${sp} (sale_id, product_id, quantity) VALUES (?, ?, ?);`;
+  const [created] = await connection.execute(query, [
+    saleId,
+    productId,
+    quantity,
+  ]);
+  return created;
 };
 
-module.exports = { createSales };
+const createSales = async () => {
+  const query = 'INSERT INTO StoreManager.sales VALUES ();';
+  const [created] = await connection.execute(query);
+  return created;
+};
+
+module.exports = { createSales, createSalesProducts };
