@@ -14,8 +14,8 @@ describe('Testa inserção de produto em sales_products', () => {
   it('testa retorno de productsSales.createSales', async () => {
     const execute = [{}];
 
-    sinon.stub(connection, 'execute').resolves([{}]);
-    const result = await productsSales.createSales(2, 2, 10);
-    expect(result).to.deep.equal([{}]);
+    sinon.stub(connection, 'execute').resolves(execute);
+    const result = await productsSales.createSalesProducts(2, 2, 10);
+    expect(result).to.deep.equal({});
   });
 });

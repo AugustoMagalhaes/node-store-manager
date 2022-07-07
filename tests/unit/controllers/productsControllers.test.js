@@ -11,19 +11,6 @@ const productsControllers = require('../../../controllers/productsControllers');
 describe('6 - Testando controller getAllProducts', async () => {
   beforeEach(sinon.restore);
 
-  /* before(async () => {
-    const allProducts = {
-      payload: [
-        { id: 1, name: 'Martelo de Thor' },
-        { id: 2, name: 'Traje de encolhimento' },
-        { id: 3, name: 'Escudo do Capitão América' },
-      ],
-      httpStatus: 200,
-    };
-
-    sinon.stub(productsServices, 'getAllProducts').resolves(allProducts);
-  }); */
-
   it('É possível chamar todos os produtos', async () => {
     const allProducts = {
       payload: [
@@ -57,7 +44,6 @@ describe('6 - Testando controller getAllProducts', async () => {
       },
     };
 
-    const msgError = { message: notFound.error.message };
     const res = {
       status: sinon.stub().callsFake(() => res),
       json: sinon.stub().returns(notFound),

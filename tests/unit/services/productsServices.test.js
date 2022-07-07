@@ -39,7 +39,6 @@ describe('4 - Procura por todos produtos em services', () => {
       const notFound = [];
       sinon.stub(productsModels, 'getAllProducts').resolves(notFound);
       const products = await productsServices.getAllProducts();
-      console.log('products 4,2', products);
       expect(products).to.have.property('error');
     });
   });
