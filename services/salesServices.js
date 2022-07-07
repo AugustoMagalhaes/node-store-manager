@@ -8,7 +8,6 @@ const createSalesProducts = async (productsList) => {
       return salesModels.createSalesProducts(insertId, productId, quantity);
     }),
   );
-  console.log('insertId no servs', productsList);
   return {
     id: insertId,
     itemsSold: productsList,

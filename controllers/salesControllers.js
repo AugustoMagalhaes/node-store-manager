@@ -1,7 +1,6 @@
 const salesServices = require('../services/salesServices');
 
 const createSalesProducts = async (req, res) => {
-  console.log('chegou no contr');
   const productsList = req.body;
 
   const products = await salesServices.createSalesProducts(productsList);
