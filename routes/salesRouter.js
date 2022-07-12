@@ -7,6 +7,8 @@ const dbHasProductId = require('../middlewares/dbHasProductId');
 const quantityValidation = require('../middlewares/quantityValidation');
 const productIdValidation = require('../middlewares/productIdValidation');
 
+salesRouter.get('/', salesController.getAllSales);
+
 salesRouter.post(
   '/',
   productIdValidation,
