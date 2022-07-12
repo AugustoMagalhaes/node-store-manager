@@ -1,5 +1,21 @@
 const salesModels = require('../models/salesModels');
 
+const getAllSales = async () => {
+  const sales = await salesModels.getAllSales();
+  if (!sales.length) {
+    return {
+      error: {
+        message: 'Cannot find sales',
+      },
+      httpStatus: 404,
+    };
+  }
+  return {
+    payload: sales,
+    httpStatus: 200,
+  };
+};
+
 const createSalesProducts = async (productsList) => {
   const { insertId } = await salesModels.createSales();
   await Promise.all(
@@ -14,4 +30,4 @@ const createSalesProducts = async (productsList) => {
   };
 };
 
-module.exports = { createSalesProducts };
+module.exports = { createSalesProducts, getAllSales };
