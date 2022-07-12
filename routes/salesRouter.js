@@ -9,6 +9,8 @@ const productIdValidation = require('../middlewares/productIdValidation');
 
 salesRouter.get('/', salesController.getAllSales);
 
+salesRouter.get('/:id', salesController.getSalesById);
+
 salesRouter.post(
   '/',
   productIdValidation,
