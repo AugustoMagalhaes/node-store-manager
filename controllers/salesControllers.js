@@ -16,6 +16,23 @@ const getAllSales = async (_req, res) => {
   }
 };
 
+const getSalesById = async (req, res) => {
+  const { id } = req.params;
+  let payload;
+  let httpStatus;
+  let error;
+  try {
+    const salesObj = await salesServices.getSalesById(id);
+    ({ payload, httpStatus, error } = salesObj);
+
+    if (error) throw new Error(error.message);
+
+    return res.status(httpStatus).json(payload);
+  } catch (err) {
+    return res.status(httpStatus).json({ message: err.message });
+  }
+};
+
 const createSalesProducts = async (req, res) => {
   const productsList = req.body;
 
@@ -23,4 +40,4 @@ const createSalesProducts = async (req, res) => {
   return res.status(201).json(products);
 };
 
-module.exports = { createSalesProducts, getAllSales };
+module.exports = { createSalesProducts, getAllSales, getSalesById };
